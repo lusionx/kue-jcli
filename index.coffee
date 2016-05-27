@@ -60,15 +60,15 @@ copyJob = (url) ->
 
 
 main = () ->
-  program.version '0.0.1'
+  program.version '0.1.1'
     .option '-d --database <root>', 'json api root'
-    .option '-s --state [name]', 'one of active inactive failed complete delayed'
+    .option '-s --state [name]', 'active inactive failed complete delayed'
     .option '-t --type [name]', 'kue type name'
-    .option '-q --query [json]', 'filter jobs eg. {"data.uid": 12312321}'
     .option '--slice [x..y]', 'default 0..999'
-    .option '--delete', 'delete job by id'
-    .option '--change [state]', 'change job state'
-    .option '--copy [url]', 'create job on other kue endWith "/job"'
+    .option '-q --query [json]', 'after get jobs, filter eg. {"data.uid": 12312321}'
+    .option '--delete', 'after query, delete job by id'
+    .option '--change [state]', 'after query, change job state'
+    .option '--copy [url]', 'clone job to other kue(endWith "/job")'
     .parse process.argv
 
   if not program.database
