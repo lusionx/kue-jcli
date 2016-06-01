@@ -1,6 +1,6 @@
 {
   "name": "kue-jcli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "kue-cli by json api",
   "main": "index.js",
   "scripts": {

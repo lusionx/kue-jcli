@@ -58,6 +58,19 @@ copyJob = (url) ->
       logger.info body
       callback null
 
+fetchStats = (opt) ->
+  opt = _.extend {}, defaultOption, opt
+  request program.database + '/stats', (err, resp, body) ->
+    return logger.error err if err
+    logger.info body
+  request program.database + '/job/types', (err, resp, body) ->
+    return logger.error err if err
+    s = ['inactive']
+    s.push v if v = opt.state
+    _.each s, (ss) ->
+      _.each JSON.parse(body), (tt) ->
+        request program.database + "/jobs/#{tt}/#{ss}/stats", (err, resp, body) ->
+          logger.info ss, tt, body if body
 
 main = () ->
   program.version '0.1.1'
@@ -66,18 +79,16 @@ main = () ->
     .option '-t --type [name]', 'kue type name'
     .option '--slice [x..y]', 'default 0..999'
     .option '-q --query [json]', 'after get jobs, filter eg. {"data.uid": 12312321}'
+    .option '--stats', 'get stats info'
     .option '--delete', 'after query, delete job by id'
     .option '--change [state]', 'after query, change job state'
     .option '--copy [url]', 'clone job to other kue(endWith "/job")'
     .parse process.argv
 
-  if not program.database
+  if not ADDR = program.database
     return program.help()
-  if /^\d+$/.test program.database
-    ADDR = uri[+program.database]
-  else
-    ADDR = program.database
   opt = _.pick program, ['state', 'type', 'slice']
+  return fetchStats(opt) if program.stats
   queryJobs opt, (err, list) ->
     if program.query
       q = JSON.parse program.query
