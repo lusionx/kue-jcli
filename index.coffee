@@ -59,18 +59,16 @@ copyJob = (url) ->
       callback null
 
 fetchStats = (opt) ->
-  opt = _.extend {}, defaultOption, opt
   request program.database + '/stats', (err, resp, body) ->
     return logger.error err if err
     logger.info body
+  return if not opt.state
   request program.database + '/job/types', (err, resp, body) ->
     return logger.error err if err
-    s = ['inactive']
-    s.push v if v = opt.state
-    _.each s, (ss) ->
+    _.each [opt.state], (ss) ->
       _.each JSON.parse(body), (tt) ->
         request program.database + "/jobs/#{tt}/#{ss}/stats", (err, resp, body) ->
-          logger.info ss, tt, body if body
+          logger.info ss, tt, JSON.parse(body).count if body
 
 main = () ->
   program.version '0.1.1'
